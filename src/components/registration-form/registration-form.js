@@ -1,82 +1,90 @@
-import { Component } from 'react'
-
+import React from "react";
+import { Formik, Form, Field, ErrorMessage } from 'formik';
+import usePoslugyService from "../../services/PoslugyService";
 import './registration-form.css';
 
-class RegistrationForm extends Component {
-	constructor(props) {
-		super(props);
-		this.state = {
-			name: '',
-			salary: "",
-		}
-	}
-
-	onValueChange = (e) => {
-		this.setState({
-			[e.target.name]: e.target.value
-		})
-	}
-
-	onSubmit = (e) => {
-		e.preventDefault();
-		if (this.state.name.length < 3 || !this.state.salary) return;
-		this.props.onAdd(this.state.name, this.state.salary);
-		this.setState({
-			name: '',
-			salary: ''
-		})
-	}
-
-	render() {
-
-		const { name, salary } = this.state
-
+const RegistrationForm = ({ active }) => {
+	const { onLogInSubmit, onSignUpSubmit } = usePoslugyService();
+	if (active === "login") {
 		return (
-			<div className="app-add-form">
-				<h3>Registration</h3>
-				<form
-					className="add-form"
-					onSubmit={this.onSubmit}>
-					<input type="text"
-						className="form-control new-post-label"
-						placeholder="Имя"
-						name='name'
-						value={name}
-						onChange={this.onValueChange} />
-					<input type="email"
-						className="form-control new-post-label"
-						placeholder="Почта"
-						name='email'
-						value={salary}
-						onChange={this.onValueChange} />
-					<input type="tel"
-						className="form-control new-post-label"
-						placeholder="Телефон"
-						name='phone'
-						value={salary}
-						onChange={this.onValueChange} />
-					<input type="text"
-						className="form-control new-post-label"
-						placeholder="Пароль"
-						name='password'
-						value={salary}
-						onChange={this.onValueChange} />
-					<input type="text"
-						className="form-control new-post-label"
-						placeholder="Пароль"
-						name='password'
-						value={salary}
-						onChange={this.onValueChange} />
-					<div className="registration-btn">
-						<button type="submit"
-							className="btn btn-outline-light">Registration
-						</button>
-					</div>
-
-				</form>
-			</div>
-		)
+			<div className="app-form">
+				<h1>Login</h1>
+				<Formik
+					initialValues={{ email: '', password: '' }}
+					validate={values => {
+						const errors = {};
+						if (!values.email) {
+							errors.email = 'Required';
+						} else if (
+							!/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i.test(values.email)
+						) {
+							errors.email = 'Invalid email address';
+						}
+						return errors;
+					}}
+					onSubmit={(values, { setSubmitting }) => {
+						setTimeout(() => {
+							// console.log(JSON.stringify(values, null, 2));
+							onLogInSubmit(JSON.stringify(values, null, 2));
+							setSubmitting(false);
+						}, 400);
+					}}
+				>
+					{({ isSubmitting }) => (
+						<Form className="add-form">
+							<Field className="form__input" type="email" name="email" placeholder="Email" />
+							<ErrorMessage name="email" component="div" />
+							<Field className="form__input" type="password" name="password" placeholder="Password" />
+							<ErrorMessage name="password" component="div" />
+							<button className="btn button" type="submit" disabled={isSubmitting}>
+								Submit
+							</button>
+						</Form>
+					)}
+				</Formik>
+			</div>)
+	} else if (active === "signup") {
+		return (
+			<div className="app-form">
+				<h1 className="form__title">Registration</h1>
+				<Formik
+					initialValues={{ email: '', password: '', name: '', phone_number: '' }}
+					validate={values => {
+						const errors = {};
+						if (!values.email) {
+							errors.email = 'Required';
+						} else if (
+							!/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i.test(values.email)
+						) {
+							errors.email = 'Invalid email address';
+						}
+						return errors;
+					}}
+					onSubmit={(values, { setSubmitting }) => {
+						setTimeout(() => {
+							// console.log(JSON.stringify(values, null, 2));
+							onSignUpSubmit(JSON.stringify(values, null, 2));
+							setSubmitting(false);
+						}, 400);
+					}}
+				>
+					{({ isSubmitting }) => (
+						<Form className="add-form">
+							<Field className="form__input" type="email" name="email" placeholder="Email" />
+							<ErrorMessage name="email" component="div" />
+							<Field className="form__input" type="password" name="password" placeholder="Password" />
+							<ErrorMessage name="password" component="div" />
+							<Field className="form__input" type="text" name="name" placeholder="Name" />
+							<ErrorMessage name="name" component="div" />
+							<Field className="form__input" type="tel" name="phone_number" placeholder="Phone" />
+							<ErrorMessage name="phone_number" component="div" />
+							<button className="btn button" type="submit" disabled={isSubmitting}>
+								Submit
+							</button>
+						</Form>
+					)}
+				</Formik>
+			</div>)
 	}
 }
-
 export default RegistrationForm;
